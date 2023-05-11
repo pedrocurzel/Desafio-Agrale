@@ -33,7 +33,15 @@ class _ConsultaChassiScreenState extends State<ConsultaChassiScreen> {
       child: Column(
         children: [
           Container(
-            color: Colors.white,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                bottom: BorderSide(
+                  color: Color(lightGrey),
+                  width: 1
+                )
+              )
+            ),
             padding: const EdgeInsets.all(18.0),
             child: Column(
               children: [

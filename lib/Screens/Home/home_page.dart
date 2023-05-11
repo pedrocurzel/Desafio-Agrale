@@ -64,7 +64,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             child: Container(
               decoration: BoxDecoration(
                   border:
-                      Border(bottom: BorderSide(width: 1, color: Colors.grey))),
+                      Border(bottom: BorderSide(width: 1, color: Color(lightGrey)))),
             ),
           ),
         ),
