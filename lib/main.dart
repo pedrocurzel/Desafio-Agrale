@@ -1,4 +1,4 @@
-import 'package:agrale/Screens/Home/home_page.dart';
+import 'package:agrale/screens/home/home_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {

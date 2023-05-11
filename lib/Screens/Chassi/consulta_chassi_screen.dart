@@ -1,6 +1,9 @@
+import 'package:agrale/models/produto.dart';
 import 'package:flutter/material.dart';
 
 import '../../consts/consts.dart';
+import '../../models/venda.dart';
+import '../../widgets/produto_actions.dart';
 
 class ConsultaChassiScreen extends StatefulWidget {
   const ConsultaChassiScreen({Key? key}) : super(key: key);
@@ -17,6 +20,9 @@ class _ConsultaChassiScreenState extends State<ConsultaChassiScreen> {
       caseSensitive: false);
   final motorRegex =
       RegExp(r"^[a-z]{1}[0-9]{1}[a-z]{1}[0-9]{6}$", caseSensitive: false);
+
+  bool isSearching = false;
+  Produto? produto;
 
   @override
   Widget build(BuildContext context) {
@@ -76,14 +82,13 @@ class _ConsultaChassiScreenState extends State<ConsultaChassiScreen> {
                               Expanded(
                                 flex: 8,
                                 child: TextFormField(
+                                  enabled: !isSearching,
                                   maxLength: 20,
-                                  onChanged: (value) {
-                                    setState(() {});
-                                  },
+                                  onChanged: (value) => setState(() {}),
                                   //validator: (text) => validateInput(text),
                                   controller: chassiController,
                                   decoration: InputDecoration(
-                                    counterText: "",
+                                      counterText: "",
                                       contentPadding: EdgeInsets.only(left: 15),
                                       hintText: "Digite aqui...",
                                       hintStyle:
@@ -92,19 +97,22 @@ class _ConsultaChassiScreenState extends State<ConsultaChassiScreen> {
                                       focusedBorder: zerarBordasInput(),
                                       errorBorder: zerarBordasInput(),
                                       focusedErrorBorder: zerarBordasInput(),
-                                      suffixIcon: validateInput()
-                                          ? IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  chassiController.clear();
-                                                });
-                                              },
-                                              icon: Icon(
-                                                Icons.close,
-                                                color: Colors.grey,
-                                              ),
-                                            )
-                                          : null),
+                                      disabledBorder: zerarBordasInput(),
+                                      suffixIcon: chassiController.text != "" ? IconButton(
+                                        onPressed: () {
+                                          if (!isSearching) {
+                                            chassiController.clear();
+                                            setState(() {
+                                              isSearching = false;
+                                              produto = null;
+                                            });
+                                          }
+                                        },
+                                        icon: Icon(
+                                          Icons.close,
+                                          color: Color(lightGrey),
+                                        ),
+                                      ) : null),
                                 ),
                               ),
                               Expanded(
@@ -123,15 +131,15 @@ class _ConsultaChassiScreenState extends State<ConsultaChassiScreen> {
                                     ),
                                     IconButton(
                                         onPressed: () {
-                                          if (validateInput()) {
-                                            searchChassi();
+                                          if (validateText() && !isSearching) {
+                                            beginSearch();
                                           }
                                         },
                                         icon: Icon(
                                           Icons.search,
-                                          color: validateInput()
-                                              ? Color(baseRed)
-                                              : Color(lightGrey),
+                                          color: isSearching
+                                              ? Color(lightGrey)
+                                              : Color(baseRed),
                                           size: 30,
                                         ))
                                   ],
@@ -143,24 +151,58 @@ class _ConsultaChassiScreenState extends State<ConsultaChassiScreen> {
                       )
                     ],
                   ),
-                )
+                ),
               ],
             ),
-          )
+          ),
+          isSearching ? Padding(padding: EdgeInsets.only(top: 20), child: CircularProgressIndicator(color: Color(baseRed),),) : SizedBox(),
+          produto != null ? ProdutoActions(product: produto!) : SizedBox(),
         ],
       ),
     );
   }
 
-  bool validateInput() {
-    String text = chassiController.text;
-    return chassiRegex.hasMatch(text) || motorRegex.hasMatch(text);
+  Future<Produto?> searchProduct() async {
+    produto = await Future.delayed(Duration(seconds: 5), () {
+      //return null;
+      return Produto(
+          name: "name",
+          engineNumber: "engineNumber",
+          frameNumber: "frameNumber",
+          secondaryFrameNumber: "secondaryFrameNumber",
+          builderNfDate: DateTime.now(),
+          venda: Venda(
+              city: "city",
+              ownerName: "ownerName",
+              sellNfDate: DateTime.now(),
+              uf: "uf"));
+    });
+    setState(() {
+      isSearching = false;
+    });
+
+    if (produto == null) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              content: Text("Produto não encontrado"),
+            );
+          });
+    }
   }
 
-  Future<void> searchChassi() async {
-    //if (formKey.currentState!.validate()) {
-    //  //pesquisar
-    //}
+  void beginSearch() async {
+    print("search begin");
+    setState(() {
+      isSearching = true;
+    });
+    await searchProduct();
+  }
+
+  bool validateText() {
+    return chassiRegex.hasMatch(chassiController.text) ||
+        motorRegex.hasMatch(chassiController.text);
   }
 
   InputBorder errorBorder() {

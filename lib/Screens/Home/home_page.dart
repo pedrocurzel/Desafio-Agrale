@@ -1,6 +1,6 @@
-import 'package:agrale/Screens/Home/home_screen.dart';
-import 'package:agrale/Screens/Menu/menu_screen.dart';
-import 'package:agrale/Screens/Chassi/consulta_chassi_screen.dart';
+import 'package:agrale/screens/home/home_screen.dart';
+import 'package:agrale/screens/menu/menu_screen.dart';
+import 'package:agrale/screens/chassi/consulta_chassi_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cupertino_icons/cupertino_icons.dart';
