@@ -13,9 +13,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  static List<Map<String, dynamic>> acompanhamentosItems = [
-    //item 0 para espaço inicial nos cards
-    {},
+  List<Map<String, dynamic>> acompanhamentosItems = [
     {"icon": Icons.chat, "label": "Lorem Ipsum", "navigateTo": null},
     {"icon": Icons.monetization_on, "label": "Lorem Ipsum", "navigateTo": null},
     {"icon": Icons.construction, "label": "Lorem Ipsum", "navigateTo": null},
@@ -53,48 +51,9 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: EdgeInsets.all(15),
           child: buildSectionTitle("Acompanhamentos"),
         ),
-        buildAcompanhamentosList()
+        buildHorizontalList(acompanhamentosItems)
       ],
     );
-  }
-
-  Widget buildAcompanhamentosList() {
-    return SizedBox(
-        height: 120,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: acompanhamentosItems.length,
-          itemBuilder: (context, index) {
-            return index == 0 ? SizedBox(width: 15,) : SizedBox(
-              width: MediaQuery.of(context).size.width / 2.5,
-              child: Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)),
-                color: Color(baseRed),
-                child: InkWell(
-                  onTap: () {},
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Icon(
-                        acompanhamentosItems[index]["icon"] as IconData,
-                        color: Colors.white,
-                        size: 30,
-                      ),
-                      Text(
-                        acompanhamentosItems[index]["label"] as String,
-                        style: TextStyle(color: Colors.white, fontSize: 15),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      );
   }
 
   Widget buildConsultasSection() {

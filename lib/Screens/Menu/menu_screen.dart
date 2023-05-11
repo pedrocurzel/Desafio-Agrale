@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
 class MenuScreen extends StatefulWidget {
-  const MenuScreen({Key? key}) : super(key: key);
-
+  MenuScreen({Key? key}) : super(key: key);
   @override
   State<MenuScreen> createState() => _MenuScreenState();
 }
