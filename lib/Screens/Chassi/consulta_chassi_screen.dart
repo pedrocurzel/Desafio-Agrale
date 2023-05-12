@@ -34,14 +34,9 @@ class _ConsultaChassiScreenState extends State<ConsultaChassiScreen> {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                bottom: BorderSide(
-                  color: Color(lightGrey),
-                  width: 1
-                )
-              )
-            ),
+                color: Colors.white,
+                border: Border(
+                    bottom: BorderSide(color: Color(lightGrey), width: 1))),
             padding: const EdgeInsets.all(18.0),
             child: Column(
               children: [
@@ -106,21 +101,23 @@ class _ConsultaChassiScreenState extends State<ConsultaChassiScreen> {
                                       errorBorder: zerarBordasInput(),
                                       focusedErrorBorder: zerarBordasInput(),
                                       disabledBorder: zerarBordasInput(),
-                                      suffixIcon: chassiController.text != "" ? IconButton(
-                                        onPressed: () {
-                                          if (!isSearching) {
-                                            chassiController.clear();
-                                            setState(() {
-                                              isSearching = false;
-                                              produto = null;
-                                            });
-                                          }
-                                        },
-                                        icon: Icon(
-                                          Icons.close,
-                                          color: Color(lightGrey),
-                                        ),
-                                      ) : null),
+                                      suffixIcon: chassiController.text != ""
+                                          ? IconButton(
+                                              onPressed: () {
+                                                if (!isSearching) {
+                                                  chassiController.clear();
+                                                  setState(() {
+                                                    isSearching = false;
+                                                    produto = null;
+                                                  });
+                                                }
+                                              },
+                                              icon: Icon(
+                                                Icons.close,
+                                                color: Color(lightGrey),
+                                              ),
+                                            )
+                                          : null),
                                 ),
                               ),
                               Expanded(
@@ -145,9 +142,9 @@ class _ConsultaChassiScreenState extends State<ConsultaChassiScreen> {
                                         },
                                         icon: Icon(
                                           Icons.search,
-                                          color: isSearching
-                                              ? Color(lightGrey)
-                                              : Color(baseRed),
+                                          color: !isSearching && validateText()
+                                              ? Color(baseRed)
+                                              : Color(lightGrey),
                                           size: 30,
                                         ))
                                   ],
@@ -163,7 +160,14 @@ class _ConsultaChassiScreenState extends State<ConsultaChassiScreen> {
               ],
             ),
           ),
-          isSearching ? Padding(padding: EdgeInsets.only(top: 20), child: CircularProgressIndicator(color: Color(baseRed),),) : SizedBox(),
+          isSearching
+              ? Padding(
+                  padding: EdgeInsets.only(top: 20),
+                  child: CircularProgressIndicator(
+                    color: Color(baseRed),
+                  ),
+                )
+              : SizedBox(),
           produto != null ? ProdutoActions(product: produto!) : SizedBox(),
         ],
       ),
@@ -204,6 +208,7 @@ class _ConsultaChassiScreenState extends State<ConsultaChassiScreen> {
     print("search begin");
     setState(() {
       isSearching = true;
+      produto = null;
     });
     await searchProduct();
   }
