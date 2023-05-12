@@ -28,14 +28,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
-        buildConsultasSection(),
-        SizedBox(
-          height: 10,
-        ),
-        buildAcompanhamentosSection()
-      ],
-    );
+        children: [
+          buildConsultasSection(),
+          SizedBox(
+            height: 10,
+          ),
+          buildAcompanhamentosSection()
+        ],
+      );
   }
 
   Widget buildSectionTitle(String sectionLabel) {

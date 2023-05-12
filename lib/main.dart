@@ -3,21 +3,19 @@ import 'package:agrale/screens/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initializeDateFormatting('pt_BR', null);
+
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     //home: HomePage(),
     color: Colors.white,
-    theme: ThemeData(
-      backgroundColor: Colors.white,
-      fontFamily: 'Verdana'
-    ),
+    theme: ThemeData(backgroundColor: Colors.white, fontFamily: 'Verdana'),
     initialRoute: '/',
     routes: {
       '/': (context) => const HomePage(),
-      '/menu': (context) => MenuScreen(),
+      //'/menu': (context) => MenuScreen(),
     },
   ));
 }

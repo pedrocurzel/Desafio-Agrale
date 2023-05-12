@@ -179,7 +179,7 @@ class _ConsultaChassiScreenState extends State<ConsultaChassiScreen> {
       //return null;
       return Produto(
           name: "name",
-          engineNumber: "engineNumber",
+          engineNumber: "93db32m23ns321234",
           frameNumber: "frameNumber",
           secondaryFrameNumber: "secondaryFrameNumber",
           builderNfDate: DateTime.now(),

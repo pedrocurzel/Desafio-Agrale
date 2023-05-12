@@ -47,11 +47,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarColor: Colors.white,
-            statusBarBrightness: Brightness.dark,
-            statusBarIconBrightness: Brightness.dark,
-          ),
+          systemOverlayStyle: toolbarDefaultSettings,
           title: Text(
             navBottomItems[tabController.index]['label'],
             style: TextStyle(color: Color(0xff4D4D4D)),
@@ -59,14 +55,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           centerTitle: true,
           elevation: 0,
           backgroundColor: Colors.white,
-          bottom: PreferredSize(
-            preferredSize: Size.fromHeight(1),
-            child: Container(
-              decoration: BoxDecoration(
-                  border:
-                      Border(bottom: BorderSide(width: 1, color: Color(lightGrey)))),
-            ),
-          ),
+          bottom: defaultAppBarBottom,
         ),
         backgroundColor: Color(backgroundWhite),
         body: SafeArea(

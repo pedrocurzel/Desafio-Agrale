@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 const int baseRed = 0xFFCD202C;
 const int lightGrey = 0xFFCCCCCC;
@@ -6,12 +7,30 @@ const int darkGrey = 0xFF4D4D4D;
 const int appGrey = 0xFF8C8C8C;
 const backgroundWhite = 0xFFE5E5E5;
 const int expansionBg = 0xFFE6E6E6;
+const int alertTextColor = 0xFF1A1A1A;
+const int appYellow = 0xFFF7D002;
+
+BorderRadius appDefaultBorderRadius = BorderRadius.circular(15);
+SystemUiOverlayStyle toolbarDefaultSettings = SystemUiOverlayStyle(
+  statusBarColor: Colors.white,
+  statusBarBrightness: Brightness.dark,
+  statusBarIconBrightness: Brightness.dark,
+);
+PreferredSize defaultAppBarBottom = PreferredSize(
+  preferredSize: Size.fromHeight(1),
+  child: Container(
+    decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(width: 1, color: Color(lightGrey)))),
+  ),
+);
 
 Widget titleText(String text, {double? fontSize}) {
   return Text(
     text,
     style: TextStyle(
-        fontSize: fontSize ?? 20, fontWeight: FontWeight.w700, color: Color(darkGrey)),
+        fontSize: fontSize ?? 20,
+        fontWeight: FontWeight.w700,
+        color: Color(darkGrey)),
   );
 }
 
@@ -37,10 +56,12 @@ Widget buildHorizontalList(List<Map<String, dynamic>> items) {
           width: MediaQuery.of(context).size.width / 2.5,
           child: Card(
             elevation: 4,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            shape: RoundedRectangleBorder(borderRadius: appDefaultBorderRadius),
             color: Color(baseRed),
             child: InkWell(
+              customBorder: RoundedRectangleBorder(
+                borderRadius: appDefaultBorderRadius,
+              ),
               onTap: () {
                 if (items[index]['navigateTo'] != null) {
                   Navigator.pushNamed(context, items[index]['navigateTo']);
