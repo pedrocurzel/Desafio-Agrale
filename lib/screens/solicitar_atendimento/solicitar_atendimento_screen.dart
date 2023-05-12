@@ -65,21 +65,21 @@ class _SolicitarAtendimentoScreenState extends State<SolicitarAtendimentoScreen>
           ],
         ),
         bottomNavigationBar: Container(
-          padding: EdgeInsets.all(10),
+          padding: EdgeInsets.only(right: 20, left: 20),
           height: 70,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Expanded(
-                child:
+                child: Row(
+                  children: [
                     tabController.index == 0 ? cancelButton() : voltarButton(),
+                  ],
+                )
               ),
-              Expanded(child: SizedBox()),
-              Expanded(
-                child: tabController.index < 7
+              tabController.index < 7
                     ? proximoButton()
                     : concluirButton(),
-              )
             ],
           ),
         ),
