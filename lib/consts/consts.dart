@@ -9,6 +9,7 @@ const backgroundWhite = 0xFFE5E5E5;
 const int expansionBg = 0xFFE6E6E6;
 const int alertTextColor = 0xFF1A1A1A;
 const int appYellow = 0xFFF7D002;
+const int selectedRed = 0xFFCD202C;
 
 BorderRadius appDefaultBorderRadius = BorderRadius.circular(15);
 SystemUiOverlayStyle toolbarDefaultSettings = SystemUiOverlayStyle(
@@ -34,12 +35,12 @@ Widget titleText(String text, {double? fontSize}) {
   );
 }
 
-TextSpan baseTextSpan(String text, bool isBold) {
+TextSpan baseTextSpan(String text, bool isBold, int textColor, {double fontSize = 18}) {
   return TextSpan(
     text: text,
     style: TextStyle(
-        fontSize: 18,
-        color: Color(appGrey),
+        fontSize: fontSize,
+        color: Color(textColor),
         fontWeight: !isBold ? FontWeight.normal : FontWeight.bold),
   );
 }

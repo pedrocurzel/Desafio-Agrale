@@ -51,12 +51,12 @@ class _ConsultaChassiScreenState extends State<ConsultaChassiScreen> {
                     Expanded(
                       child: RichText(
                         text: TextSpan(children: [
-                          baseTextSpan("Informe um ", false),
-                          baseTextSpan("número de motor ", true),
-                          baseTextSpan("ou ", false),
-                          baseTextSpan("Chassi ", true),
+                          baseTextSpan("Informe um ", false, appGrey),
+                          baseTextSpan("número de motor ", true, appGrey),
+                          baseTextSpan("ou ", false, appGrey),
+                          baseTextSpan("Chassi ", true, appGrey),
                           baseTextSpan(
-                              "para prosseguir com o atendimento ", false),
+                              "para prosseguir com o atendimento ", false, appGrey),
                         ]),
                       ),
                     )
