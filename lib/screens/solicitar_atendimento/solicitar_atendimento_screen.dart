@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:agrale/models/selecao_atendimento_classes.dart';
 import 'package:agrale/models/produto.dart';
 import 'package:flutter/material.dart';
-
+import 'package:agrale/services/image_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../consts/consts.dart';
 
 class SolicitarAtendimentoScreen extends StatefulWidget {
@@ -16,6 +19,20 @@ class SolicitarAtendimentoScreen extends StatefulWidget {
 class _SolicitarAtendimentoScreenState extends State<SolicitarAtendimentoScreen>
     with TickerProviderStateMixin {
   late TabController tabController;
+
+  ImageService imageService = ImageService();
+  File? fotoPlaqueta;
+  File? fotoHodometro;
+  bool semAcessoImagemPlaqueta = false;
+  bool semAcessoImagemHodometro = false;
+
+  var hodometroFormKey = GlobalKey<FormState>();
+  var hodometroInputController = TextEditingController();
+
+  var atendimentoFormKey = GlobalKey<FormState>();
+  var atendimentoTituloInputController = TextEditingController();
+  var atendimentoDescricaoInputController = TextEditingController();
+
 
   List<CategoriaAtendimento> categoriaAtendimentoList = [
     CategoriaAtendimento("Atendimento Técnico", "images/atendimento_tecnico.png", isSelected: true),
@@ -89,15 +106,16 @@ class _SolicitarAtendimentoScreenState extends State<SolicitarAtendimentoScreen>
             categoriaAtendimento(),
             linhaDeProduto(),
             gruposDeOcorrencia(),
-            Text("4"),
-            Text("5"),
-            Text("6"),
+            fotoPlaquetaWidget(),
+            fotoHodometroWidget(),
+            situacaoWidget(),
             Text("7"),
             Text("8")
           ],
         ),
         bottomNavigationBar: Container(
           padding: EdgeInsets.only(right: 20, left: 20),
+          color: Colors.white,
           height: 70,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -116,6 +134,388 @@ class _SolicitarAtendimentoScreenState extends State<SolicitarAtendimentoScreen>
     );
   }
 
+  Widget situacaoWidget() {
+    return Container(
+      color: Colors.white,
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.all(25),
+            child: Row(
+              children: [
+                Expanded(
+                  child: RichText(
+                    text: TextSpan(children: [
+                      baseTextSpan("Descreva a ", false, alertTextColor,
+                          fontSize: defaultSpanFontSize),
+                      baseTextSpan(
+                          "situação ", true, alertTextColor,
+                          fontSize: defaultSpanFontSize),
+                      baseTextSpan("que necessita ", false, alertTextColor,
+                          fontSize: defaultSpanFontSize),
+                      baseTextSpan(
+                          "de atendimento", true, alertTextColor,
+                          fontSize: defaultSpanFontSize),
+                    ]),
+                  ),
+                )
+              ],
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.only(left: 25, right: 25),
+                child: Column(
+                  children: [
+                    Form(
+                      key: atendimentoFormKey,
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              defaultInput(atendimentoTituloInputController, "Título", TextInputType.text)
+                            ],
+                          ),
+                          SizedBox(height: 15,),
+                          Row(
+                            children: [
+                              defaultInput(atendimentoDescricaoInputController, "Descrição", TextInputType.text, minLines: 15, maxLines: 30)
+                            ],
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget fotoHodometroWidget() {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.all(25),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: RichText(
+                  text: TextSpan(children: [
+                    baseTextSpan("Adicione a foto do ", false, alertTextColor,
+                        fontSize: defaultSpanFontSize),
+                    baseTextSpan(
+                        "Hodômetro ", true, alertTextColor,
+                        fontSize: defaultSpanFontSize),
+                  ]),
+                ),
+              )
+            ],
+          ),
+          SizedBox(height: 15,),
+          Row(
+            children: [
+              Form(
+                key: hodometroFormKey,
+                child: defaultInput(hodometroInputController, "Informe a quilometragem ou horas", TextInputType.number),
+              )
+            ],
+          ),
+          SizedBox(height: 15,),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  fotoHodometro == null ? Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.add_photo_alternate, color: Color(darkGrey),),
+                                  SizedBox(width: 5,),
+                                  Text("Adicionar Imagem", style: TextStyle(color: Color(darkGrey)),),
+                                ],
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                  fixedSize: Size(double.infinity, 50),
+                                  backgroundColor: Color(adicionarImagensButtonColor),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15)
+                                  )
+                              ),
+                              onPressed: () async {
+                                fotoHodometro = await getImage();
+                                setState(() {});
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 15,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Tamanho máximo: 25MB", style: TextStyle(color: Color(darkGrey)),),
+                        ],
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            semAcessoImagemHodometro = !semAcessoImagemHodometro;
+                          });
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Checkbox(
+                              value: semAcessoImagemHodometro,
+                              onChanged: (value) {setState(() {
+                                semAcessoImagemHodometro = !semAcessoImagemHodometro;
+                              });},
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5)
+                              ),
+                              activeColor: Color(baseRed),
+                            ),
+                            Text("Não tenho acesso à imagem")
+                          ],
+                        ),
+                      )
+                    ],
+                  ) : SizedBox(),
+                  fotoHodometro != null ? Column(
+                    children: [
+                      Image.file(fotoHodometro!, height: MediaQuery.of(context).size.height / 2.2),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(onPressed: (){
+                            setState(() {
+                              fotoHodometro = null;
+                            });
+                          }, icon: Icon(Icons.delete, color: Color(appGrey),))
+                        ],
+                      )
+                    ],
+                  ) : SizedBox()
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget defaultInput(TextEditingController controller, String hintText, TextInputType keyboardType, {int minLines =1, int maxLines = 1,}) {
+    return Expanded(
+      child: TextFormField(
+        minLines: minLines,
+        maxLines: maxLines,
+        controller: controller,
+        keyboardType: keyboardType,
+        cursorColor: Color(appGrey),
+        //maxLines: maxLines,
+        decoration: InputDecoration(
+
+          suffixIcon: IconButton(
+            onPressed: () {controller.clear();},
+            icon: Icon(Icons.close, color: Color(appGrey),),
+          ),
+          hintText: hintText,
+          fillColor:  Color(expansionBg),
+          focusColor: Color(expansionBg),
+          filled: true,
+          border: UnderlineInputBorder(
+              borderSide: BorderSide(
+                  color: Colors.yellow,
+                  width: 1
+              )
+          ),
+          focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(
+                  color: Color(appGrey),
+                  width: 1
+              )
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget fotoPlaquetaWidget() {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.all(25),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: RichText(
+                  text: TextSpan(children: [
+                    baseTextSpan("Adicione a foto ", false, alertTextColor,
+                        fontSize: defaultSpanFontSize),
+                    baseTextSpan(
+                        "da plaqueta ", true, alertTextColor,
+                        fontSize: defaultSpanFontSize),
+                    baseTextSpan(
+                        "com o ", false, alertTextColor,
+                        fontSize: defaultSpanFontSize),
+                    baseTextSpan(
+                        "número do motor ", true, alertTextColor,
+                        fontSize: defaultSpanFontSize),
+                    baseTextSpan(
+                        "ou ", false, alertTextColor,
+                        fontSize: defaultSpanFontSize),
+                    baseTextSpan(
+                        "Chassi", true, alertTextColor,
+                        fontSize: defaultSpanFontSize),
+                  ]),
+                ),
+              )
+            ],
+          ),
+          SizedBox(height: 15,),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  fotoPlaqueta == null ? Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.add_photo_alternate, color: Color(darkGrey),),
+                                  SizedBox(width: 5,),
+                                  Text("Adicionar Imagem", style: TextStyle(color: Color(darkGrey)),),
+                                ],
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                  fixedSize: Size(double.infinity, 50),
+                                  backgroundColor: Color(adicionarImagensButtonColor),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15)
+                                  )
+                              ),
+                              onPressed: () async {
+                                fotoPlaqueta = await getImage();
+                                setState(() {});
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 15,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Tamanho máximo: 25MB", style: TextStyle(color: Color(darkGrey)),),
+                        ],
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            semAcessoImagemPlaqueta = !semAcessoImagemPlaqueta;
+                          });
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Checkbox(
+                              value: semAcessoImagemPlaqueta,
+                              onChanged: (value) {setState(() {
+                                semAcessoImagemPlaqueta = !semAcessoImagemPlaqueta;
+                              });},
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5)
+                              ),
+                              activeColor: Color(baseRed),
+                            ),
+                            Text("Não tenho acesso à imagem")
+                          ],
+                        ),
+                      )
+                    ],
+                  ) : SizedBox(),
+                  fotoPlaqueta != null ? Column(
+                    children: [
+                      Image.file(fotoPlaqueta!, height: MediaQuery.of(context).size.height / 2.2),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(onPressed: (){
+                            setState(() {
+                              fotoPlaqueta = null;
+                            });
+                          }, icon: Icon(Icons.delete, color: Color(appGrey),))
+                        ],
+                      )
+                    ],
+                  ) : SizedBox()
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<File?> getImage() async {
+    ImageSource? source = await showDialog(context: context, builder: (context) {
+      return AlertDialog(
+        content: Container(
+          height: 195,
+          width: MediaQuery.of(context).size.width - 200,
+          color: Colors.white,
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(onPressed: (){Navigator.pop(context, null);}, icon: Icon(Icons.close))
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Text("Escolha uma opção abaixo", textAlign: TextAlign.center,),
+                  )
+                ],
+              ),
+              SizedBox(height: 15,),
+              button("Camera", Icons.add_a_photo, adicionarImagensButtonColor, () {Navigator.pop(context, ImageSource.camera);}),
+              SizedBox(height: 10,),
+              button("Galeria", Icons.add_photo_alternate_rounded, adicionarImagensButtonColor, () {Navigator.pop(context, ImageSource.gallery);})
+            ],
+          ),
+        ),
+      );
+    });
+
+    if (source != null) {
+      return await imageService.getImage(source: source);
+      //imageVariable = await imageService.getImage(source: source);
+      //setState(() {});
+    }
+    return null;
+  }
+
   Widget gruposDeOcorrencia() {
     return Container(
       //padding: EdgeInsets.all(25),
@@ -130,10 +530,10 @@ class _SolicitarAtendimentoScreenState extends State<SolicitarAtendimentoScreen>
                   child: RichText(
                     text: TextSpan(children: [
                       baseTextSpan("Selecione o(s) ", false, alertTextColor,
-                          fontSize: 35),
+                          fontSize: defaultSpanFontSize),
                       baseTextSpan(
                           "Grupo(s) de Ocorrência", true, alertTextColor,
-                          fontSize: 35),
+                          fontSize: defaultSpanFontSize),
                     ]),
                   ),
                 )
@@ -169,10 +569,10 @@ class _SolicitarAtendimentoScreenState extends State<SolicitarAtendimentoScreen>
                   child: RichText(
                     text: TextSpan(children: [
                       baseTextSpan("Qual a ", false, alertTextColor,
-                          fontSize: 35),
+                          fontSize: defaultSpanFontSize),
                       baseTextSpan(
                           "Linha de Produto?", true, alertTextColor,
-                          fontSize: 35),
+                          fontSize: defaultSpanFontSize),
                     ]),
                   ),
                 )
@@ -216,8 +616,8 @@ class _SolicitarAtendimentoScreenState extends State<SolicitarAtendimentoScreen>
           children: [
             Container(
               padding: EdgeInsets.all(circularIconContainer ? 25 : 10),
-              width: 90,
-              height: 90,
+              width: 75,
+              height: 75,
               decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(circularIconContainer ? 100 : 20)
@@ -231,7 +631,7 @@ class _SolicitarAtendimentoScreenState extends State<SolicitarAtendimentoScreen>
             ),
             Text(
               item.nome,
-              style: TextStyle(fontSize: 25, color: textAndIconColor),
+              style: TextStyle(fontSize: 22, color: textAndIconColor),
             )
           ],
         ),
@@ -253,10 +653,10 @@ class _SolicitarAtendimentoScreenState extends State<SolicitarAtendimentoScreen>
                   child: RichText(
                     text: TextSpan(children: [
                       baseTextSpan("Selecione a ", false, alertTextColor,
-                          fontSize: 35),
+                          fontSize: defaultSpanFontSize),
                       baseTextSpan(
                           "Categoria de Atendimento", true, alertTextColor,
-                          fontSize: 35),
+                          fontSize: defaultSpanFontSize),
                     ]),
                   ),
                 )
@@ -308,9 +708,59 @@ class _SolicitarAtendimentoScreenState extends State<SolicitarAtendimentoScreen>
   Widget proximoButton() {
     return ElevatedButton(
       onPressed: () {
-        setState(() {
-          tabController.animateTo(tabController.index + 1);
-        });
+        if (tabController.index == 2) {
+          if (grupoOcorrenciaList.any((element) => element.isSelected == true)) {
+            passarPag();
+          } else {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return selecaoObrigatoria();
+              }
+            );
+          }
+        } else if (tabController.index == 3) {
+          if ((fotoPlaqueta != null) || (semAcessoImagemPlaqueta)) {
+            passarPag();
+          } else {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    content: Text("Necessário adicionar uma foto ou marcar a opção"),
+                  );
+                }
+            );
+          }
+        } else if(tabController.index == 4) {
+          if ((fotoHodometro != null || semAcessoImagemHodometro) && hodometroInputController.text != "") {
+            passarPag();
+          } else {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    content: Text("Necessário o campo preenchido e adicionar uma foto ou marcar a opção"),
+                  );
+                }
+            );
+          }
+        } else if (tabController.index == 5) {
+          if (atendimentoTituloInputController.text.isNotEmpty && atendimentoDescricaoInputController.text.isNotEmpty) {
+            passarPag();
+          } else {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    content: Text("Necessário os dois campos preenchidos"),
+                  );
+                }
+            );
+          }
+        } else {
+          passarPag();
+        }
       },
       child: Icon(
         Icons.arrow_forward,
@@ -322,6 +772,115 @@ class _SolicitarAtendimentoScreenState extends State<SolicitarAtendimentoScreen>
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
     );
+  }
+
+  Widget selecaoObrigatoria() {
+    return AlertDialog(
+      content: SizedBox(
+        width: MediaQuery.of(context).size.width - 100,
+        height: 240,
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  onPressed: (){
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(Icons.close),
+                )
+              ],
+            ),
+            SizedBox(height: 15,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Seleção obrigatória",
+                  style: TextStyle(
+                      color: Color(alertTextColor),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 24),
+                )
+              ],
+            ),
+            SizedBox(height: 25,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: RichText(
+                    text: TextSpan(children: [
+                      baseTextSpan("Ao menos um ", false, alertTextColor),
+                      baseTextSpan(
+                          "Grupo de Ocorrência ", true, alertTextColor),
+                      baseTextSpan(
+                          "deve ser selecionado.", false, alertTextColor),
+                    ]),
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              ],
+            ),
+            SizedBox(height: 25,),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      fixedSize: Size(double.infinity, 50),
+                      backgroundColor: Color(0xFFE10000),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)
+                      )
+                    ),
+                    onPressed: (){
+                      Navigator.pop(context);
+                    },
+                    child: Text("Fechar"),
+                  ),
+                )
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget button(String label, IconData icon, int bgColor, Function callback) {
+    return Row(
+      children: [
+        Expanded(
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                fixedSize: Size(double.infinity, 50),
+                backgroundColor: Color(bgColor),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15)
+                )
+            ),
+            onPressed: (){
+              callback();
+            },
+            child: Row(
+              children: [
+                Icon(icon, color: Color(darkGrey),),
+                SizedBox(width: 10,),
+                Text(label, style: TextStyle(color: Color(darkGrey)),)
+              ],
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  void passarPag() {
+    setState(() {
+      tabController.animateTo(tabController.index + 1);
+    });
   }
 
   Widget voltarButton() {
@@ -358,8 +917,8 @@ class _SolicitarAtendimentoScreenState extends State<SolicitarAtendimentoScreen>
               ],
             ),
             content: Container(
-              height: 285,
-              width: MediaQuery.of(context).size.width - 130,
+              height: 325,
+              width: MediaQuery.of(context).size.width,
               child: Column(
                 children: [
                   Row(

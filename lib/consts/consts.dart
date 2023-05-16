@@ -10,6 +10,9 @@ const int expansionBg = 0xFFE6E6E6;
 const int alertTextColor = 0xFF1A1A1A;
 const int appYellow = 0xFFF7D002;
 const int selectedRed = 0xFFCD202C;
+const int adicionarImagensButtonColor = 0xFFF5F5F5;
+
+const double defaultSpanFontSize = 30;
 
 BorderRadius appDefaultBorderRadius = BorderRadius.circular(15);
 SystemUiOverlayStyle toolbarDefaultSettings = SystemUiOverlayStyle(

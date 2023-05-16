@@ -60,7 +60,7 @@ class _ProdutoActionsState extends State<ProdutoActions> {
         Padding(
             padding: EdgeInsets.only(top: 10, bottom: 10),
             child: SizedBox(
-              height: 150,
+              height: 130,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
@@ -204,13 +204,15 @@ class _ProdutoActionsState extends State<ProdutoActions> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(color: Color(darkGrey), fontSize: 15)),
-          Text(
-            info,
-            style: TextStyle(
-                color: Color(darkGrey),
-                fontWeight: FontWeight.bold,
-                fontSize: 15),
+          Expanded(child: Text(label, style: TextStyle(color: Color(darkGrey), fontSize: 15))),
+          Flexible(
+            child: Text(
+              info,
+              style: TextStyle(
+                  color: Color(darkGrey),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15),
+            ),
           )
         ],
       ),

@@ -83,7 +83,7 @@ class _ConsultaChassiScreenState extends State<ConsultaChassiScreen> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Expanded(
-                                flex: 8,
+                                flex: 6,
                                 child: TextFormField(
                                   enabled: !isSearching,
                                   maxLength: 20,
