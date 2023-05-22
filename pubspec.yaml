@@ -39,6 +39,9 @@ dependencies:
   google_fonts: ^4.0.4
   intl: ^0.18.1
   image_picker: ^0.8.7+5
+  camera: 0.9.4+3
+  path_provider: ^2.0.15
+  path: ^1.8.2
 
 dev_dependencies:
   flutter_test:

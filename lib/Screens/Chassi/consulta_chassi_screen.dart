@@ -96,11 +96,11 @@ class _ConsultaChassiScreenState extends State<ConsultaChassiScreen> {
                                       hintText: "Digite aqui...",
                                       hintStyle:
                                           TextStyle(color: Color(lightGrey)),
-                                      enabledBorder: zerarBordasInput(),
-                                      focusedBorder: zerarBordasInput(),
-                                      errorBorder: zerarBordasInput(),
-                                      focusedErrorBorder: zerarBordasInput(),
-                                      disabledBorder: zerarBordasInput(),
+                                      enabledBorder: zerarBordasInput,
+                                      focusedBorder: zerarBordasInput,
+                                      errorBorder: zerarBordasInput,
+                                      focusedErrorBorder: zerarBordasInput,
+                                      disabledBorder: zerarBordasInput,
                                       suffixIcon: chassiController.text != ""
                                           ? IconButton(
                                               onPressed: () {
@@ -223,11 +223,5 @@ class _ConsultaChassiScreenState extends State<ConsultaChassiScreen> {
         borderSide: BorderSide(color: Colors.black, width: 1));
   }
 
-  OutlineInputBorder zerarBordasInput() {
-    return OutlineInputBorder(
-        borderSide: BorderSide(
-      width: 0,
-      color: Colors.transparent,
-    ));
-  }
+
 }

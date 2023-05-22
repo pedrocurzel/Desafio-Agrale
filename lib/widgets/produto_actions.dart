@@ -31,18 +31,16 @@ class _ProdutoActionsState extends State<ProdutoActions> {
   Widget build(BuildContext context) {
     return Expanded(
       child: SingleChildScrollView(
-          child: Expanded(
-        child: Container(
-            color: Colors.white,
-            child: Column(
-              children: [
-                acoesSection(),
-                Row(
-                  children: [dadosProdutoSection()],
-                )
-              ],
-            )),
-      )),
+          child: Container(
+              color: Colors.white,
+              child: Column(
+                children: [
+                  acoesSection(),
+                  Row(
+                    children: [dadosProdutoSection()],
+                  )
+                ],
+              ))),
     );
   }
 

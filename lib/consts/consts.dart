@@ -12,7 +12,7 @@ const int appYellow = 0xFFF7D002;
 const int selectedRed = 0xFFCD202C;
 const int adicionarImagensButtonColor = 0xFFF5F5F5;
 
-const double defaultSpanFontSize = 30;
+const double defaultSpanFontSize = 25;
 
 BorderRadius appDefaultBorderRadius = BorderRadius.circular(15);
 SystemUiOverlayStyle toolbarDefaultSettings = SystemUiOverlayStyle(
@@ -27,6 +27,19 @@ PreferredSize defaultAppBarBottom = PreferredSize(
         border: Border(bottom: BorderSide(width: 1, color: Color(lightGrey)))),
   ),
 );
+
+UnderlineInputBorder lightGreyInputBorder = UnderlineInputBorder(
+    borderSide: BorderSide(
+        color: Color(lightGrey),
+        width: 1
+    )
+);
+
+OutlineInputBorder zerarBordasInput = OutlineInputBorder(
+    borderSide: BorderSide(
+      width: 0,
+      color: Colors.transparent,
+    ));
 
 Widget titleText(String text, {double? fontSize}) {
   return Text(
@@ -93,3 +106,4 @@ Widget buildHorizontalList(List<Map<String, dynamic>> items) {
     ),
   );
 }
+
