@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:agrale/models/selecao_atendimento_classes.dart';
 import 'package:agrale/models/produto.dart';
 import 'package:agrale/screens/solicitar_atendimento/foto_comentario/foto_comentario_screen.dart';
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:agrale/services/image_picker.dart';
 import 'package:image_picker/image_picker.dart';
@@ -72,8 +71,6 @@ class _SolicitarAtendimentoScreenState extends State<SolicitarAtendimentoScreen>
     GrupoOcorrencia("Transmissão", "images/transmissao.png"),
   ];
 
-  late CameraController cameraController;
-
   Map<String, dynamic> selecao = {'categoriaSelecionada': null};
 
   @override
@@ -81,11 +78,6 @@ class _SolicitarAtendimentoScreenState extends State<SolicitarAtendimentoScreen>
     // TODO: implement initState
     super.initState();
     tabController = TabController(length: 8, vsync: this, initialIndex: 0);
-    availableCameras()
-    .then((cameras) {
-      cameraController = CameraController(cameras[0], ResolutionPreset.max);
-      cameraController.initialize();
-    });
   }
 
   @override
@@ -210,7 +202,12 @@ class _SolicitarAtendimentoScreenState extends State<SolicitarAtendimentoScreen>
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15))),
                         onPressed: () async {
-                          var res = await Navigator.push(context, MaterialPageRoute(builder: (context) => FotoComentario()));
+                          var res = await goToFotosAuxiliares(null, null);
+                          if (res != null) {
+                            setState(() {
+                              imagensAuxiliaresList.add(res as Map<String, dynamic>);
+                            });
+                          }
                         },
                       ),
                     ),
@@ -218,43 +215,96 @@ class _SolicitarAtendimentoScreenState extends State<SolicitarAtendimentoScreen>
                       height: 10,
                     ),
                     Text("Tamanho máximo do arquivo: 25MB"),
-                    for (var imagem in imagensAuxiliaresList)
-                      Container(
-                        margin: EdgeInsets.all(5),
-                        padding: EdgeInsets.all(15),
-                        height: 200,
-                        decoration: BoxDecoration(
-                            border: Border(
-                                bottom:
-                                    BorderSide(width: 1, color: Colors.black))),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Image.file(
-                                  imagem["imagem"],
-                                  height: 150,
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Comentário"),
-                                      Text(
-                                          imagem["comentario"] + "adsasdasdasd")
-                                    ],
+                    for (var i = 0; i < imagensAuxiliaresList.length; i++)
+                      GestureDetector(
+                        onTap: () async {
+                          //var updatedItem = await goToFotosAuxiliares(imagem["comentario"], imagem["imagem"]);
+                          //if (updatedItem != null) {
+                          //  setState(() {
+                          //    imagem["comentario"] = updatedItem["comentario"];
+                          //    imagem["imagem"] = updatedItem["imagem"];
+                          //  });
+                          //}
+                        },
+                        child: Container(
+                          margin: EdgeInsets.all(5),
+                          padding: EdgeInsets.all(15),
+                          //height: 200,
+                          decoration: BoxDecoration(
+                              border: Border(
+                                  bottom:
+                                      BorderSide(width: 1, color: Colors.black))),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width / 4,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Image.file(
+                                          imagensAuxiliaresList[i]["imagem"],
+                                          height: 150,
+                                        ),
+                                      ],
+                                    )
                                   ),
-                                )
-                              ],
-                            ),
-                            Row(
-                              children: [Text("zzz")],
-                            )
-                          ],
+                                  SizedBox(width: 10,),
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text("Comentário", style: TextStyle(color: Color(appGrey), fontSize: 16)),
+                                        SizedBox(height: 8,),
+                                        Container(
+                                          height: 120,
+                                          child: Scrollbar(
+                                            thumbVisibility: true,
+                                            child: SingleChildScrollView(
+                                              child: Text(
+                                                imagensAuxiliaresList[i]["comentario"],
+                                                style: TextStyle(
+                                                    color: Color(darkGrey),
+                                                    fontSize: 24
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    IconButton(onPressed: (){
+                                      setState(() {
+                                        imagensAuxiliaresList.removeAt(i);
+                                      });
+                                    }, icon: Icon(Icons.delete), color: Color(appGrey),),
+                                    IconButton(onPressed: () async {
+                                      var updatedItem = await goToFotosAuxiliares(imagensAuxiliaresList[i]["comentario"], imagensAuxiliaresList[i]["imagem"]);
+                                      if (updatedItem != null) {
+                                        setState(() {
+                                          imagensAuxiliaresList[i]["comentario"] = updatedItem["comentario"];
+                                          imagensAuxiliaresList[i]["imagem"] = updatedItem["imagem"];
+                                        });
+                                      }
+                                    }, icon: Icon(Icons.edit), color: Color(appGrey),),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       )
                   ],
@@ -267,68 +317,8 @@ class _SolicitarAtendimentoScreenState extends State<SolicitarAtendimentoScreen>
     );
   }
 
-  dynamic cameraComComentario() {
-    showGeneralDialog(
-        context: context,
-        barrierColor: Colors.black,
-        pageBuilder: (_,__,___) {
-          return Scaffold(
-            resizeToAvoidBottomInset: true,
-            body: Column(
-              children: [
-                Expanded(
-                  child: CameraPreview(cameraController),
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        color: Colors.white,
-                        height: 80,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Card(
-                                elevation: 0,
-                                child: TextField(
-                                  onChanged: (value) {print('aaaa');setState(() {});},
-                                  controller: fotoComentarioController,
-                                  decoration: InputDecoration(
-                                    hintText: "Comentário",
-                                    border: zerarBordasInput,
-                                    enabledBorder: zerarBordasInput,
-                                    focusedBorder: zerarBordasInput,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: fotoComentarioController.text.isNotEmpty ? () async {
-                                print("1");
-                                try {
-                                  var a = await cameraController.takePicture();
-                                  print("2");
-                                } catch(e) {
-                                  print(e);
-                                  print("3");
-                                }
-                              } : null,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Icon(Icons.send, color: Color(fotoComentarioController.text.isNotEmpty ? baseRed : lightGrey),),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    )
-                  ],
-                )
-              ],
-            ),
-          );
-        }
-    );
+  Future<dynamic> goToFotosAuxiliares(String? comentario, File? foto) async {
+    return await Navigator.push(context, MaterialPageRoute(builder: (context) => FotoComentario(comentario: comentario, foto: foto,)));
   }
 
   Widget situacaoWidget() {
@@ -986,13 +976,19 @@ class _SolicitarAtendimentoScreenState extends State<SolicitarAtendimentoScreen>
   Widget concluirButton() {
     return ElevatedButton(
       onPressed: () {},
-      child: Icon(
-        Icons.check,
-        size: 35,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Icon(
+            Icons.send,
+            size: 35,
+          ),
+          Text("Enviar")
+        ],
       ),
       style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.green,
-          fixedSize: Size(80, 50),
+          backgroundColor: Color(baseRed),
+          fixedSize: Size(150, 50),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
     );
@@ -1001,41 +997,41 @@ class _SolicitarAtendimentoScreenState extends State<SolicitarAtendimentoScreen>
   Widget proximoButton() {
     return ElevatedButton(
       onPressed: () {
-        //if (tabController.index == 2) {
-        //  if (grupoOcorrenciaList
-        //      .any((element) => element.isSelected == true)) {
-        //    passarPag();
-        //  } else {
-        //    showDialog(
-        //        context: context,
-        //        builder: (context) {
-        //          return selecaoObrigatoria();
-        //        });
-        //  }
-        //} else if (tabController.index == 3) {
-        //  if ((fotoPlaqueta != null) || (semAcessoImagemPlaqueta)) {
-        //    passarPag();
-        //  } else {
-        //    showAlertDialog("Necessário adicionar uma foto ou marcar a opção");
-        //  }
-        //} else if (tabController.index == 4) {
-        //  if ((fotoHodometro != null || semAcessoImagemHodometro) &&
-        //      hodometroInputController.text != "") {
-        //    passarPag();
-        //  } else {
-        //    showAlertDialog(
-        //        "Necessário o campo preenchido e adicionar uma foto ou marcar a opção");
-        //  }
-        //} else if (tabController.index == 5) {
-        //  if (atendimentoTituloInputController.text.isNotEmpty &&
-        //      atendimentoDescricaoInputController.text.isNotEmpty) {
-        //    passarPag();
-        //  } else {
-        //    showAlertDialog("Necessário os dois campos preenchidos");
-        //  }
-        //} else {
+        if (tabController.index == 2) {
+          if (grupoOcorrenciaList
+              .any((element) => element.isSelected == true)) {
+            passarPag();
+          } else {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return selecaoObrigatoria();
+                });
+          }
+        } else if (tabController.index == 3) {
+          if ((fotoPlaqueta != null) || (semAcessoImagemPlaqueta)) {
+            passarPag();
+          } else {
+            showAlertDialog("Necessário adicionar uma foto ou marcar a opção");
+          }
+        } else if (tabController.index == 4) {
+          if ((fotoHodometro != null || semAcessoImagemHodometro) &&
+              hodometroInputController.text != "") {
+            passarPag();
+          } else {
+            showAlertDialog(
+                "Necessário o campo preenchido e adicionar uma foto ou marcar a opção");
+          }
+        } else if (tabController.index == 5) {
+          if (atendimentoTituloInputController.text.isNotEmpty &&
+              atendimentoDescricaoInputController.text.isNotEmpty) {
+            passarPag();
+          } else {
+            showAlertDialog("Necessário os dois campos preenchidos");
+          }
+        } else {
           passarPag();
-        //}
+        }
       },
       child: Icon(
         Icons.arrow_forward,
